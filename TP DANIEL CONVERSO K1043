@@ -1,0 +1,83 @@
+#include <iostream>
+#include<fstream>
+
+using namespace std;
+const int dimprod{5};
+void inicializarArreglos(int dimcli,float kmtot[][dimprod],float pesotot[][dimprod]){
+for (int i=0;i<dimcli;i++){
+    for (int j=0;j<dimprod;j++){
+        pesotot[i][j]=0;
+        kmtot[i][j]=0;
+        }
+    }
+}
+
+int main(){
+const int dimcli{8},dimprod{5}, minpeso {13000};
+int entregas[dimprod] {0,0,0,0,0};
+string clientes[dimcli], auxproductos[dimprod+dimcli], productos[dimprod];
+ifstream archilecnombres;
+archilecnombres.open("nombres.txt");
+for(int i=0;i<dimcli;i++){
+    archilecnombres>>clientes[i];
+}
+for(int j=dimcli;j<dimprod+dimcli;j++){
+    archilecnombres>>auxproductos[j];
+}
+for (int i=0;i<dimprod;i++){
+    productos[i]=auxproductos[i+dimcli];
+}
+archilecnombres.close();
+int numcli; int codprod; int contador[dimcli] {0,0,0,0,0,0,0,0};
+float peso; float kmrec;
+float pesotot[dimcli][dimprod]; float kmtot[dimcli][dimprod];
+inicializarArreglos(dimcli,kmtot,pesotot);
+ifstream archilecdatos;
+archilecdatos.open("datos.txt");
+while(archilecdatos>>numcli>>codprod>>peso>>kmrec){
+  pesotot[numcli][codprod]+=peso;
+  kmtot[numcli][codprod]+=kmrec;
+  entregas[codprod]++;
+}
+archilecdatos.close();
+cout<< "LISTA DE PRODUCTOS POR CLIENTE CUYOS PESOS SUPEREN LOS 13000KG \n";
+    for (int i=0;i<dimcli;i++){
+        for (int j=0;j<dimprod;j++){
+            if (pesotot[i][j]>minpeso){
+                contador[i]++;
+                cout<< clientes[i]<<" "<< productos[j]<< endl;
+            }
+        }
+    }
+int mayor=0;
+int posmayor=0;
+for (int i=0;i<dimcli;i++){
+    if(contador[i]>mayor){
+        mayor=contador[i];
+        posmayor=i;
+    }
+}
+cout <<"\nEl que mas tipos de producto vendio es "<< clientes[posmayor] <<"\n"<<endl;
+float mayorxkm[dimprod];
+for(int i=0;i<dimprod;i++){
+    mayorxkm[i]=kmtot[posmayor][i];
+}
+int arregloauxi[dimprod] {0,1,2,3,4};
+
+for(int i=0;i<dimprod-1;i++){
+    if(mayorxkm[i]>mayorxkm[i+1]){
+        float aux=mayorxkm[i];
+        int aux2=arregloauxi[i];
+        mayorxkm[i]=mayorxkm[i+1];
+        mayorxkm[i+1]=aux;
+        arregloauxi[i]=arregloauxi[i+1];
+        arregloauxi[i+1]=aux2;
+        i=0;
+    }
+}
+for(int i=0;i<dimprod;i++){
+    cout<<productos[arregloauxi[i]]<<" " <<mayorxkm[i]<<"km" <<endl;
+}
+cout<<"\nLa cantidad de entregas del producto con mas kilometros recorridos es de: "<< entregas[arregloauxi[dimprod-1]]<<endl;
+return 0;
+}
